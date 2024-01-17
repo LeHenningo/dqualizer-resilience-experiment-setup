@@ -5,6 +5,18 @@ import psutil
 app = Flask(__name__)
 
 
+def check_process_exists(process_name):
+    print(f"checking for process {process_name} " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    # Check is Case-sensitive!
+    for process in psutil.process_iter(['pid', 'name']):
+        if process.info['name'] == process_name:
+            print(f"process {process_name} exists " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            return True
+
+    print(f"process {process_name} was not found " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    return False
+
+
 @app.route('/check_process', methods=['GET'])
 def get_process_exists():
     process_name = request.args.get('name')
@@ -12,14 +24,9 @@ def get_process_exists():
     if not process_name:
         return jsonify({"error": "Process name not provided"}), 400
 
-    print(f"checking for process {process_name} " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    # Check is Case-sensitive!
-    for process in psutil.process_iter(['pid', 'name']):
-        if process.info['name'] == process_name:
-            print(f"process {process_name} exists " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-            return jsonify({f"{process_name} exists": True})
+    if check_process_exists(process_name):
+        return jsonify({f"{process_name} exists": True})
 
-    print(f"process {process_name} was not found " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     return jsonify({f"{process_name} exists": False})
 
 

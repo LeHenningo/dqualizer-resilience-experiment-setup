@@ -7,7 +7,7 @@ processNameToCheck = "KeePassXC.exe"
 
 class HTTPRequestHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
-        if processAPI.get_process_exists(processNameToCheck, False):
+        if processAPI.check_process_exists(processNameToCheck):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.send_header('Connection', 'close')  # Disable keep-alive Connections
